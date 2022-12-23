@@ -1,16 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*   get_next_line_bonus.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: marmulle <marmulle@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/14 13:14:16 by marmulle          #+#    #+#             */
-/*   Updated: 2022/12/20 18:39:56 by marmulle         ###   ########.fr       */
+/*   Updated: 2022/12/20 18:54:27 by marmulle         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h"
+#include "get_next_line_bonus.h"
 
 char	*free_and_null(char	*str)
 {
@@ -63,23 +63,23 @@ char	*handle_eof(char **cache)
 
 char	*get_next_line(int fd)
 {
-	static char	*cache;
+	static char	*cache[OPEN_MAX];
 	char		*buffer;
 
 	if (fd < 0 || BUFFER_SIZE < 1 || read(fd, NULL, 0) < 0)
 		return (NULL);
-	if (!cache)
-		cache = NULL;
+	if (!cache[fd])
+		cache[fd] = NULL;
 	while (1)
 	{
-		if (scan_for_newline(cache))
-			return (grab_line(&cache));
+		if (scan_for_newline(cache[fd]))
+			return (grab_line(&cache[fd]));
 		buffer = get_buffer(fd);
 		if (buffer == NULL)
 		{
 			free_and_null(buffer);
-			return (handle_eof(&cache));
+			return (handle_eof(&cache[fd]));
 		}
-		cache = append_buffer(cache, buffer);
+		cache[fd] = append_buffer(cache[fd], buffer);
 	}
 }
